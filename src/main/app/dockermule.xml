@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+    <mongo:config name="Mongo_DB" doc:name="Mongo DB" database="indra" username="indra" host="mongo"/>
+    <flow name="dockermuleFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/insert" doc:name="HTTP"/>
+        <set-payload value="{
+  &quot;firstName&quot; : &quot;Indra&quot;,
+  &quot;lastName&quot; : &quot;Tanniru&quot;
+}
+" doc:name="Set Payload"/>
+        <logger message="Running inside Docker... Cheers!!" level="INFO" doc:name="Logger"/>
+        <mongo:insert-object config-ref="Mongo_DB" collection="students" doc:name="Mongo DB"/>
+    </flow>
+    <flow name="dockermuleRetrieval" >
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/get" doc:name="HTTP" allowedMethods="GET"/>
+        <logger message="Trying to retrieve collections" level="INFO" doc:name="Logger"/>
+        <mongo:find-objects config-ref="Mongo_DB" collection="students" doc:name="Mongo DB"/>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+    </flow>
+</mule>
