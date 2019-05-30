@@ -5,6 +5,7 @@
 	<groupId>com.mycompany</groupId>
 	<artifactId>dockermule</artifactId>   
    	<packaging>mule</packaging>
+	 <version></version>
 	<name>Mule dockermule Application</name>
 
     <properties>
